@@ -3,7 +3,11 @@
 - Create React App
 - Configure Tailwind CSS
 - Build Header
+- Routing of App
 - Build Login Form
+    - Sign in Form
+    - Sign up Form
+- Form Validation 
 
 
 
