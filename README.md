@@ -7,7 +7,10 @@
 - Build Login Form
     - Sign in Form
     - Sign up Form
-- Form Validation 
+- Form Validation
+- Configure and setup firebase
+- Deploy app to production
+- Create signup user account in firebase 
 
 
 

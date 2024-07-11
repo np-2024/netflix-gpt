@@ -2,10 +2,18 @@ import React, { useState, useRef } from "react";
 import Header from "./Header";
 import { LOGO_IMG_URL } from "../utils/constants";
 import { checkValidData } from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const navigate = useNavigate();
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
@@ -13,15 +21,45 @@ const Login = () => {
   const toggleSignInForm = () => setIsSignInForm(!isSignInForm);
 
   const handleButtonClick = () => {
-    if (emailRef.current.value === "" || passwordRef.current.value === "") {
-      setErrorMsg("ⓘ Please enter correct details");
-      return;
-    }
-    const isValidData = checkValidData(
+    const isValidMessage = checkValidData(
       emailRef.current.value,
       passwordRef.current.value
     );
-    setErrorMsg(isValidData);
+    setErrorMsg(isValidMessage);
+    if (isValidMessage) return;
+
+    if (!isSignInForm) {
+      //sign up
+      createUserWithEmailAndPassword(
+        auth,
+        emailRef.current.value,
+        passwordRef.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          if (user) navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMsg(errorCode + "- " + errorMessage);
+        });
+    } else {
+      signInWithEmailAndPassword(
+        auth,
+        emailRef.current.value,
+        passwordRef.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          if (user) navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMsg(errorCode + "- " + errorMessage);
+        });
+    }
   };
 
   return (
@@ -63,16 +101,16 @@ const Login = () => {
         >
           {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
-        <div className="font-light">
+        <div className="font-light pl-2 mt-4">
           {isSignInForm ? "New to Netflix? " : "Already registered "}
           <span className="font-bold cursor-pointer" onClick={toggleSignInForm}>
             {isSignInForm ? "Sign up now." : "Sign in now."}
           </span>
           <br />
-          <span className="text-xs font-thin m-0 p-0">
+          <div className="text-xs font-thin m-0 p-0 mt-6">
             This page is protected by Google reCAPTCHA to ensure you're not a
             bot. Learn more.
-          </span>
+          </div>
         </div>
       </form>
     </div>
